@@ -1,0 +1,3 @@
+"""Esquemas compartidos entre agentes."""
+
+

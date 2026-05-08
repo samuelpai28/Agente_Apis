@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Configuración de CORS (opcional)
+# Configuración de CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,55 +14,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Modelo Pydantic para un contacto
-class Contact(BaseModel):
+# Modelo de producto
+class Product(BaseModel):
     id: int
     name: str
-    phone: str
-    email: str
+    price: float
+    category: str
 
 # Almacenamiento en memoria
-contacts = []
+products = []
 next_id = 1
 
-@app.post("/contacts/", response_model=Contact)
-def create_contact(contact: Contact):
-    """Crear un nuevo contacto."""
+@app.post("/products/", response_model=Product)
+def create_product(product: Product):
+    """Crea un nuevo producto."""
     global next_id
-    contact.id = next_id
-    contacts.append(contact)
+    product.id = next_id
+    products.append(product)
     next_id += 1
-    return contact
+    return product
 
-@app.get("/contacts/", response_model=List[Contact])
-def list_contacts():
-    """Listar todos los contactos."""
-    return contacts
+@app.get("/products/", response_model=List[Product])
+def list_products():
+    """Lista todos los productos."""
+    return products
 
-@app.get("/contacts/{contact_id}", response_model=Contact)
-def get_contact(contact_id: int):
-    """Obtener un contacto por ID."""
-    for contact in contacts:
-        if contact.id == contact_id:
-            return contact
-    raise HTTPException(status_code=404, detail="Contact not found")
+@app.get("/products/{product_id}", response_model=Product)
+def get_product(product_id: int):
+    """Obtiene un producto por su ID."""
+    for product in products:
+        if product.id == product_id:
+            return product
+    raise HTTPException(status_code=404, detail="Product not found")
 
-@app.put("/contacts/{contact_id}", response_model=Contact)
-def update_contact(contact_id: int, updated_contact: Contact):
-    """Actualizar un contacto existente."""
-    for index, contact in enumerate(contacts):
-        if contact.id == contact_id:
-            contacts[index] = updated_contact
-            contacts[index].id = contact_id  # Mantener el ID original
-            return contacts[index]
-    raise HTTPException(status_code=404, detail="Contact not found")
+@app.put("/products/{product_id}", response_model=Product)
+def update_product(product_id: int, updated_product: Product):
+    """Actualiza un producto existente."""
+    for index, product in enumerate(products):
+        if product.id == product_id:
+            products[index] = updated_product
+            updated_product.id = product_id
+            return updated_product
+    raise HTTPException(status_code=404, detail="Product not found")
 
-@app.delete("/contacts/{contact_id}", response_model=Contact)
-def delete_contact(contact_id: int):
-    """Eliminar un contacto por ID."""
-    for index, contact in enumerate(contacts):
-        if contact.id == contact_id:
-            return contacts.pop(index)
-    raise HTTPException(status_code=404, detail="Contact not found")
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int):
+    """Elimina un producto por su ID."""
+    for index, product in enumerate(products):
+        if product.id == product_id:
+            del products[index]
+            return {"detail": "Product deleted"}
+    raise HTTPException(status_code=404, detail="Product not found")
 
 # Para ejecutar: uvicorn main:app --reload

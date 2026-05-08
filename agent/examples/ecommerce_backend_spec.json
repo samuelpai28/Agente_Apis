@@ -1,0 +1,95 @@
+{
+  "source_format": "natural_language",
+  "source_summary": "Dominio ecommerce con usuarios, productos, ordenes y items de orden.",
+  "entities": [
+    {
+      "name": "User",
+      "plural_name": "Users",
+      "attributes": [
+        {"name": "id", "type": "int", "required": true, "unique": true},
+        {"name": "email", "type": "str", "required": true, "unique": true},
+        {"name": "full_name", "type": "str", "required": true, "unique": false}
+      ]
+    },
+    {
+      "name": "Product",
+      "plural_name": "Products",
+      "attributes": [
+        {"name": "id", "type": "int", "required": true, "unique": true},
+        {"name": "name", "type": "str", "required": true, "unique": false},
+        {"name": "price", "type": "float", "required": true, "unique": false},
+        {"name": "stock", "type": "int", "required": true, "unique": false}
+      ]
+    },
+    {
+      "name": "Order",
+      "plural_name": "Orders",
+      "attributes": [
+        {"name": "id", "type": "int", "required": true, "unique": true},
+        {"name": "user_id", "type": "int", "required": true, "unique": false},
+        {"name": "status", "type": "str", "required": true, "unique": false},
+        {"name": "total_amount", "type": "float", "required": true, "unique": false}
+      ]
+    },
+    {
+      "name": "OrderItem",
+      "plural_name": "OrderItems",
+      "attributes": [
+        {"name": "id", "type": "int", "required": true, "unique": true},
+        {"name": "order_id", "type": "int", "required": true, "unique": false},
+        {"name": "product_id", "type": "int", "required": true, "unique": false},
+        {"name": "quantity", "type": "int", "required": true, "unique": false}
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "source_entity": "User",
+      "target_entity": "Order",
+      "relation_type": "one_to_many",
+      "source_field": "id",
+      "target_field": "user_id"
+    },
+    {
+      "source_entity": "Order",
+      "target_entity": "OrderItem",
+      "relation_type": "one_to_many",
+      "source_field": "id",
+      "target_field": "order_id"
+    },
+    {
+      "source_entity": "Product",
+      "target_entity": "OrderItem",
+      "relation_type": "one_to_many",
+      "source_field": "id",
+      "target_field": "product_id"
+    }
+  ],
+  "crud_endpoints": [
+    {"method": "POST", "path": "/users/", "operation": "create", "entity": "User", "relation": null},
+    {"method": "GET", "path": "/users/", "operation": "list", "entity": "User", "relation": null},
+    {"method": "GET", "path": "/users/{user_id}", "operation": "get", "entity": "User", "relation": null},
+    {"method": "PUT", "path": "/users/{user_id}", "operation": "update", "entity": "User", "relation": null},
+    {"method": "DELETE", "path": "/users/{user_id}", "operation": "delete", "entity": "User", "relation": null}
+  ],
+  "relational_endpoints": [
+    {
+      "method": "GET",
+      "path": "/users/{user_id}/orders",
+      "operation": "list_relation",
+      "entity": "User",
+      "relation": "User-Order"
+    },
+    {
+      "method": "GET",
+      "path": "/orders/{order_id}/items",
+      "operation": "list_relation",
+      "entity": "Order",
+      "relation": "Order-OrderItem"
+    }
+  ],
+  "consistency_notes": [
+    "Modelo ecommerce con trazabilidad de compras por usuario."
+  ]
+}
+
